@@ -1,11 +1,14 @@
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
+#include <ESP8266mDNS.h>
+
 #include <FS.h>
 #include <LittleFS.h>
+
 #include <ESPAsyncTCP.h>
 #include <ESPAsyncWebServer.h>
 #include <SPIFFSEditor.h>
-#include <ESP8266mDNS.h>
+#include <ArduinoJson.h>
 
 // SKETCH BEGIN
 AsyncWebServer server(80);
@@ -23,27 +26,29 @@ const char* http_password = "admin";
 void setup(){
   Serial.begin(115200);
   Serial.setDebugOutput(true);
-  WiFi.mode(WIFI_AP_STA);
-  WiFi.softAP(hostName);
-  WiFi.begin(ssid, password);
-  if (WiFi.waitForConnectResult() != WL_CONNECTED) {
-    Serial.printf("STA: Failed!\n");
-    WiFi.disconnect(false);
-    delay(1000);
-    WiFi.begin(ssid, password);
-  }
-
+  
   
 
-  MDNS.addService("http","tcp",80);
+  // Initialize LittleFS
+  if(!LittleFS.begin()){
+    Serial.println("An Error has occurred while mounting LittleFS");
+    return;
+  }
 
-  LittleFS.begin();
+  // Connect to Wi-Fi
+  WiFi.begin(ssid, password);
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(1000);
+    Serial.println("Connecting to WiFi..");
+  }
 
+  // Print ESP32 Local IP Address
+  Serial.println(WiFi.localIP());
 
 
 
   server.addHandler(new SPIFFSEditor(http_username,http_password));
-
+  MDNS.addService("http","tcp",80);
   
   server.on("/heap", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send(200, "text/plain", String(ESP.getFreeHeap()));
