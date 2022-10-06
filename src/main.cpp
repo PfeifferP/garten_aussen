@@ -10,18 +10,19 @@
 #include <SPIFFSEditor.h>
 #include <ArduinoJson.h>
 
+
 // SKETCH BEGIN
 AsyncWebServer server(80);
 
 
+// MQTT pub/sub for the servo functions
+#define CLOUDMQTT_CONFIG  "/config.json"
 
 
-
-const char* ssid = "*******";
-const char* password = "*******";
-const char * hostName = "esp-async";
-const char* http_username = "admin";
-const char* http_password = "admin";
+// Variablen
+#include "variables.h"
+// Subincludes
+#include "functions.h"
 
 void setup(){
   Serial.begin(115200);
@@ -34,6 +35,13 @@ void setup(){
     Serial.println("An Error has occurred while mounting LittleFS");
     return;
   }
+  // Should load default config if run for the first time
+  Serial.println(F("Loading configuration..."));
+  loadConfiguration(CLOUDMQTT_CONFIG, config);
+  
+
+
+
 
   // Connect to Wi-Fi
   WiFi.begin(ssid, password);
