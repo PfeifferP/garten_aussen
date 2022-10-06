@@ -9,7 +9,7 @@
 #include <ESPAsyncWebServer.h>
 #include <SPIFFSEditor.h>
 #include <ArduinoJson.h>
-
+#include <StreamUtils.h>
 
 // SKETCH BEGIN
 AsyncWebServer server(80);

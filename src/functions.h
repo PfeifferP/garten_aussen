@@ -8,8 +8,9 @@ void loadConfiguration(const char *filename, Config &config) {
   // Use arduinojson.org/v6/assistant to compute the capacity.
   StaticJsonDocument<512> doc;
 
+  ReadBufferingStream bufferedFile(file, 64);
   // Deserialize the JSON document
-  DeserializationError error = deserializeJson(doc, file);
+  DeserializationError error = deserializeJson(doc, bufferedFile);
   if (error)
     Serial.println(F("Failed to read file, using default configuration"));
 
