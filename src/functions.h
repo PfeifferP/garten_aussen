@@ -1,5 +1,5 @@
 // Loads the configuration from a file
-bool readConfigFile(char* fileName)
+void readConfigFile(char* fileName)
 {
   File configFile = LittleFS.open(fileName, "r");
   if (!configFile) {
@@ -23,7 +23,7 @@ bool readConfigFile(char* fileName)
     Serial.println(F("Failed to read file, using default configuration"));
 
   // Copy values from the JsonObject to the Config
-  settings.sta_ssid = doc["ssid"];
+  strcpy(settings.sta_ssid, doc["ssid"], sizeof(settings.sta_ssid));
   settings.sta_pass = doc["pass"];
   
 
@@ -35,7 +35,7 @@ bool readConfigFile(char* fileName)
 
 // Initialize WiFi
 bool initialize_Wifi() {
-  if(settings.sta_ssid ="" ){
+  if(settings.sta_ssid == "" ){
     Serial.println("Undefined SSID or IP address.");
     return false;
   }
@@ -44,7 +44,7 @@ bool initialize_Wifi() {
   
 
   
-  WiFi.begin(ssid.c_str(), password.c_str());
+  WiFi.begin(settings.sta_ssid, settings.sta_pass);
   Serial.println("Connecting to WiFi...");
 
   unsigned long current_time = millis();
