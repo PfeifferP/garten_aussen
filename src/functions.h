@@ -15,7 +15,7 @@ bool readConfigFile(char* fileName)
 
   // Allocate the memory pool on the stack.
   // Use arduinojson.org/assistant to compute the capacity.
-  StaticJsonDocument<256> doc;
+  StaticJsonDocument<512> doc;
 
   // Deserialize the JSON document
   DeserializationError error = deserializeJson(doc, configFile);
@@ -24,11 +24,8 @@ bool readConfigFile(char* fileName)
 
   // Copy values from the JsonObject to the Config
   settings.sta_ssid = doc["ssid"];
-  Config.pass = root["pass"];
-  if (whichFile)
-  {
-    Config.hFlag = root["hFlag"];
-  }
+  settings.sta_pass = doc["pass"];
+  
 
   // We don't need the file anymore
   configFile.close();
@@ -38,7 +35,7 @@ bool readConfigFile(char* fileName)
 
 // Initialize WiFi
 bool initialize_Wifi() {
-  if(settings.sta_ssid=="" ){
+  if(settings.sta_ssid ="" ){
     Serial.println("Undefined SSID or IP address.");
     return false;
   }

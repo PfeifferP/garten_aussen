@@ -37,7 +37,7 @@ void setup(){
   }
   // Should load default config if run for the first time
   Serial.println(F("Loading configuration..."));
-  loadConfiguration(CLOUDMQTT_CONFIG, settings);
+  //loadConfiguration(CLOUDMQTT_CONFIG);
   
 
 
