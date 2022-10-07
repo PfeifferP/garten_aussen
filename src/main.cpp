@@ -9,7 +9,7 @@
 #include <ESPAsyncWebServer.h>
 #include <SPIFFSEditor.h>
 #include <ArduinoJson.h>
-#include <StreamUtils.h>
+
 
 // SKETCH BEGIN
 AsyncWebServer server(80);
@@ -37,14 +37,14 @@ void setup(){
   }
   // Should load default config if run for the first time
   Serial.println(F("Loading configuration..."));
-  loadConfiguration(CLOUDMQTT_CONFIG, config);
+  loadConfiguration(CLOUDMQTT_CONFIG, settings);
   
 
 
 
 
   // Connect to Wi-Fi
-  WiFi.begin(ssid, password);
+  WiFi.begin(settings.sta_ssid, settings.sta_pass);
   while (WiFi.status() != WL_CONNECTED) {
     delay(1000);
     Serial.println("Connecting to WiFi..");

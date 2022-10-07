@@ -1,29 +1,44 @@
 // Loads the configuration from a file
-void loadConfiguration(const char *filename, Config &config) {
-  // Open file for reading
-  File file = LittleFS.open(filename, "r");
+bool readConfigFile(char* fileName)
+{
+  File configFile = LittleFS.open(fileName, "r");
+  if (!configFile) {
+    Serial.println("Failed to open config file");
+    return false;
+  }
 
-  // Allocate a temporary JsonDocument
-  // Don't forget to change the capacity to match your requirements.
-  // Use arduinojson.org/v6/assistant to compute the capacity.
-  StaticJsonDocument<512> doc;
+  size_t size = configFile.size();
+  if (size > 1024) {
+    Serial.println("Config file size is too large");
+    return false;
+  }
 
-  ReadBufferingStream bufferedFile(file, 64);
+  // Allocate the memory pool on the stack.
+  // Use arduinojson.org/assistant to compute the capacity.
+  StaticJsonDocument<256> doc;
+
   // Deserialize the JSON document
-  DeserializationError error = deserializeJson(doc, bufferedFile);
+  DeserializationError error = deserializeJson(doc, configFile);
   if (error)
     Serial.println(F("Failed to read file, using default configuration"));
 
-  // Copy values from the JsonDocument to the Config
-  strlcpy(config.hostname, doc["hostname"] | "example.com", sizeof(config.hostname)); 
+  // Copy values from the JsonObject to the Config
+  settings.sta_ssid = doc["ssid"];
+  Config.pass = root["pass"];
+  if (whichFile)
+  {
+    Config.hFlag = root["hFlag"];
+  }
 
-  // Close the file (Curiously, File's destructor doesn't close the file)
-  file.close();
+  // We don't need the file anymore
+  configFile.close();
+
+  return true;
 }
 
 // Initialize WiFi
 bool initialize_Wifi() {
-  if(ssid=="" ){
+  if(settings.sta_ssid=="" ){
     Serial.println("Undefined SSID or IP address.");
     return false;
   }
